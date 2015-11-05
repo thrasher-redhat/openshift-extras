@@ -1190,6 +1190,23 @@ module Installer
         end
       end
       if action == :add
+        # BUG 1259072 - Check for case where we don't have any nodes able to pair with a new district and warn user to avoid having to delete a district
+        if deployment.nodes.length == deployment.districts.length
+          menu_header = "\nThere are currently no Nodes that can be moved to a new district.  However the new district should have a node.\nChoose a resolution from below"
+          menu_choice = "Continue process and delete an existing district to free a Node"
+        else
+          menu_header = "\nEvery district should have a node."
+          menu_choice = "Move an existing Node from another district"
+        end
+        # Query user if they want to create a node when adding a new district
+        choose do |menu|
+          menu.header = menu_header
+          menu.prompt = "#{translate(:menu_prompt)} "
+          menu.choice("Create a new Node to be associated with the new district"){ ui_edit_host_instance(nil, :node) }
+          menu.choice(menu_choice){}
+          menu.hidden("q") { return }
+        end
+        # Add the district
         ui_modify_district
       elsif action == :modify
         if deployment.districts.length == 1
@@ -1317,7 +1334,7 @@ module Installer
               say "\nNo available hosts to add."
             else
               choose do |menu|
-                menu.header = "\nChoose a Node host to add to this district"
+                menu.header = "\nChoose a Node host to add to this district\nRemember, you can always respond with 'q' to exit"
                 menu.prompt = "#{translate(:menu_prompt)} "
                 host_choices.sort_by{ |h| h.host }.each do |host_instance|
                   current_district = deployment.get_district_by_node(host_instance)
