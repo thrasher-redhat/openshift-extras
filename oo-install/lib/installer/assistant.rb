@@ -1338,7 +1338,9 @@ module Installer
                 district.add_node_host(node_to_add)
               end
             end
-            if deployment.districts.select { |d| d == district }.empty?
+            if district.node_hosts.length == 0
+              # Bug 1278933 - Check for case where no node was added to district, do NOT save to disk
+            elsif deployment.districts.select { |d| d == district }.empty?
               deployment.add_district! district
             else
               deployment.save_to_disk!
