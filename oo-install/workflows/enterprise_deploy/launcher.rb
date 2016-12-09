@@ -239,6 +239,7 @@ def build_host_config(host_instance, step_props)
 
   #TODO: add logic to assistant for other unused variables
   #CONF_NO_NTP (all)
+  host_conig['CONF_NO_NTP'] = true
   #CONF_KEEP_NAMESERVERS (all)
   #CONF_KEEP_HOSTNAME (all)
   #CONF_FORWARD_DNS (nameserver only)
